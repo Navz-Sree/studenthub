@@ -28,9 +28,5 @@ StudentHub is a full-stack student management web application built using Spring
 4. Open:
 http://localhost:8081/login.html
 
-##Author
-NavyaSree
-
 ## Author
-
 Navya Sree
