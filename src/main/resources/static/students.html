@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Student Management</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            background: linear-gradient(to right,#4facfe,#00f2fe);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+        }
+
+        .container{
+            background:white;
+            padding:30px;
+            width:850px;
+            border-radius:15px;
+            box-shadow:0px 0px 15px rgba(0,0,0,0.2);
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:20px;
+        }
+
+        input{
+            width:100%;
+            padding:10px;
+            margin-top:10px;
+            border-radius:8px;
+            border:1px solid gray;
+            box-sizing:border-box;
+        }
+
+        button{
+            width:100%;
+            padding:10px;
+            margin-top:20px;
+            background:#4facfe;
+            color:white;
+            border:none;
+            border-radius:8px;
+            font-size:16px;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#00c6fb;
+        }
+
+        table{
+            width:100%;
+            margin-top:20px;
+            border-collapse:collapse;
+            table-layout:fixed;
+            word-wrap:break-word;
+        }
+
+        th, td{
+            border:1px solid gray;
+            padding:10px;
+            text-align:center;
+        }
+
+        th{
+            background:#4facfe;
+            color:white;
+        }
+
+        .update-btn{
+            background:orange;
+            color:white;
+            border:none;
+            padding:6px 10px;
+            border-radius:5px;
+            cursor:pointer;
+            width:90px;
+        }
+
+        .delete-btn{
+            background:red;
+            color:white;
+            border:none;
+            padding:6px 10px;
+            border-radius:5px;
+            cursor:pointer;
+            width:90px;
+        }
+
+        .action-buttons{
+            display:flex;
+            flex-direction:column;
+            gap:5px;
+            align-items:center;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Student Management</h2>
+
+    <input type="text"
+           id="name"
+           placeholder="Enter Name">
+
+    <input type="text"
+           id="course"
+           placeholder="Enter Course">
+
+    <input type="email"
+           id="email"
+           placeholder="Enter Email">
+
+    <input type="hidden" id="studentId">
+
+    <button id="submitBtn"
+            onclick="addStudent()">
+        Add Student
+    </button>
+
+    <h3>Student List</h3>
+
+    <input type="text"
+           id="search"
+           placeholder="Search Student"
+           onkeyup="searchStudent()">
+
+    <table id="studentTable">
+
+        <thead>
+
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Course</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+    function editStudent(id,name,course,email){
+
+        document.getElementById("studentId").value = id;
+
+        document.getElementById("name").value = name;
+
+        document.getElementById("course").value = course;
+
+        document.getElementById("email").value = email;
+
+        document.getElementById("submitBtn").innerText =
+            "Update Student";
+    }
+
+    async function addStudent(){
+
+        const id =
+            document.getElementById("studentId").value;
+
+        const student = {
+
+            name:
+            document.getElementById("name").value,
+
+            course:
+            document.getElementById("course").value,
+
+            email:
+            document.getElementById("email").value
+        };
+
+        let url =
+            "http://localhost:8081/students/add";
+
+        let method = "POST";
+
+        if(id){
+
+            url =
+                `http://localhost:8081/students/update/${id}`;
+
+            method = "PUT";
+        }
+
+        const response = await fetch(url,{
+
+            method:method,
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify(student)
+        });
+
+        if(response.ok){
+
+            alert(
+                id
+                    ? "Student Updated Successfully"
+                    : "Student Added Successfully"
+            );
+
+            document.getElementById("studentId").value = "";
+
+            document.getElementById("name").value = "";
+
+            document.getElementById("course").value = "";
+
+            document.getElementById("email").value = "";
+
+            document.getElementById("submitBtn").innerText =
+                "Add Student";
+
+            loadStudents();
+
+        }else{
+
+            alert("Operation Failed");
+        }
+    }
+
+    async function loadStudents(){
+
+        const response =
+            await fetch("http://localhost:8081/students/all");
+
+        const students =
+            await response.json();
+
+        let rows = "";
+
+        students.forEach(student => {
+
+            rows += `
+                <tr>
+
+                    <td>${student.id}</td>
+
+                    <td>${student.name}</td>
+
+                    <td>${student.course}</td>
+
+                    <td>${student.email}</td>
+
+                    <td>
+
+                        <div class="action-buttons">
+
+                            <button class="update-btn"
+                                onclick="editStudent(
+                                ${student.id},
+                                '${student.name}',
+                                '${student.course}',
+                                '${student.email}')">
+
+                                Update
+
+                            </button>
+
+                            <button class="delete-btn"
+                                onclick="deleteStudent(${student.id})">
+
+                                Delete
+
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+            `;
+        });
+
+        document.querySelector(
+            "#studentTable tbody"
+        ).innerHTML = rows;
+    }
+
+    async function deleteStudent(id){
+
+        await fetch(
+            `http://localhost:8081/students/delete/${id}`,
+            {
+                method:"DELETE"
+            }
+        );
+
+        loadStudents();
+    }
+
+    function searchStudent(){
+
+        let input =
+            document.getElementById("search")
+                .value
+                .toLowerCase();
+
+        let rows =
+            document.querySelectorAll(
+                "#studentTable tbody tr"
+            );
+
+        rows.forEach(row => {
+
+            let name =
+                row.cells[1]
+                    .innerText
+                    .toLowerCase();
+
+            if(name.includes(input)){
+
+                row.style.display = "";
+
+            }else{
+
+                row.style.display = "none";
+            }
+
+        });
+    }
+
+    loadStudents();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Student Login</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            background: linear-gradient(to right,#4facfe,#00f2fe);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+        }
+
+        .container{
+            background:white;
+            padding:40px;
+            width:350px;
+            border-radius:15px;
+            box-shadow:0px 0px 15px rgba(0,0,0,0.2);
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        input{
+            width:100%;
+            padding:12px;
+            margin-top:15px;
+            border-radius:8px;
+            border:1px solid gray;
+            font-size:16px;
+            box-sizing:border-box;
+        }
+
+        button{
+            width:100%;
+            padding:12px;
+            margin-top:20px;
+            background:#4facfe;
+            color:white;
+            border:none;
+            border-radius:8px;
+            font-size:16px;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#00c6fb;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Student Login</h2>
+
+    <input type="text"
+           id="username"
+           placeholder="Enter Username">
+
+    <input type="password"
+           id="password"
+           placeholder="Enter Password">
+
+    <button onclick="login()">
+        Login
+    </button>
+
+</div>
+
+<script>
+
+    async function login() {
+
+        const username =
+            document.getElementById("username").value;
+
+        const password =
+            document.getElementById("password").value;
+
+        const response = await fetch(
+            `http://localhost:8081/api/login?username=${username}&password=${password}`
+        );
+
+        const message = await response.text();
+
+        if(message === "Login Success"){
+
+            alert("Login Successful");
+
+            window.location.href = "students.html";
+
+        }else{
+
+            alert("Invalid Username or Password");
+        }
+    }
+
+</script>
+
+</body>
+</html>

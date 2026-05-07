@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+
+    <style>
+
+        body{
+            margin:0;
+            padding:0;
+            font-family:Arial;
+            height:100vh;
+            background:linear-gradient(to right,#6a11cb,#2575fc);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .login-box{
+            background:white;
+            padding:30px;
+            border-radius:15px;
+            width:350px;
+            text-align:center;
+            box-shadow:0px 0px 20px rgba(0,0,0,0.2);
+        }
+
+        h2{
+            margin-bottom:20px;
+        }
+
+        input{
+            width:100%;
+            padding:12px;
+            margin-top:15px;
+            border-radius:8px;
+            border:1px solid #ccc;
+            box-sizing:border-box;
+        }
+
+        button{
+            width:100%;
+            padding:12px;
+            margin-top:20px;
+            border:none;
+            border-radius:8px;
+            background:#2575fc;
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#1a5edb;
+        }
+
+        #result{
+            margin-top:15px;
+            font-weight:bold;
+        }
+
+        .success{
+            color:green;
+        }
+
+        .error{
+            color:red;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h2>Student Login</h2>
+
+    <form onsubmit="loginUser(event)">
+
+        <input
+                type="text"
+                id="username"
+                placeholder="Enter Username"
+                required
+        >
+
+        <input
+                type="password"
+                id="password"
+                placeholder="Enter Password"
+                required
+        >
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+    <p id="result"></p>
+
+</div>
+
+<script>
+
+    function loginUser(event){
+
+        event.preventDefault();
+
+        let username =
+            document.getElementById("username").value;
+
+        let password =
+            document.getElementById("password").value;
+
+        fetch(`/api/login?username=${username}&password=${password}`)
+
+            .then(response => response.text())
+
+            .then(data => {
+
+                let result =
+                    document.getElementById("result");
+
+                result.innerText = data;
+
+                if(data.includes("Successful")){
+
+                    result.className = "success";
+
+                    setTimeout(() => {
+
+                        window.location.href =
+                            "students.html";
+
+                    },1000);
+
+                }
+                else{
+
+                    result.className = "error";
+
+                }
+
+            })
+
+            .catch(error => {
+
+                document.getElementById("result").innerText =
+                    "Server Error ❌";
+
+            });
+
+    }
+
+</script>
+
+</body>
+</html>
